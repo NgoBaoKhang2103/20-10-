@@ -214,7 +214,15 @@
       transform: scale(1.2);
     }
 
+    /* Prevent browser scroll anchoring from jumping back up when lyrics/stage update */
+    .no-scroll-anchor {
+      overflow-anchor: none;
+    }
+
     /* Custom Scrollbar for Lyrics */
+    .lyrics-scroll {
+      overflow-anchor: none;
+    }
     .lyrics-scroll::-webkit-scrollbar {
       width: 5px;
     }
@@ -454,10 +462,10 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
       <!-- LEFT COLUMN (7 cols): Music Stage, Synced Lyrics & Bouquet Climax -->
-      <div class="lg:col-span-7 flex flex-col gap-6">
+      <div class="lg:col-span-7 flex flex-col gap-6 no-scroll-anchor">
 
         <!-- 1. Beat-Synced Vinyl Player & Real-Time Visualizer Card -->
-        <section class="glass-card rounded-3xl p-5 sm:p-6 relative overflow-hidden">
+        <section class="glass-card rounded-3xl p-5 sm:p-6 relative overflow-hidden no-scroll-anchor">
           <!-- Stage Status Pill -->
           <div class="flex items-center justify-between gap-2 mb-4">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100/90 border border-rose-200 text-rose-700 text-xs font-semibold">
@@ -631,7 +639,7 @@
         </section>
 
         <!-- 2. Karaoke Beat-Synced Lyrics Stage -->
-        <section class="glass-card rounded-3xl p-5 sm:p-6">
+        <section class="glass-card rounded-3xl p-5 sm:p-6 no-scroll-anchor">
           <div class="flex items-center justify-between mb-3">
             <h3 class="font-serif-display font-bold text-base sm:text-lg text-rose-950 flex items-center gap-2">
               <span>🎤</span>
@@ -641,7 +649,7 @@
           </div>
 
           <!-- Active Highlighted Lyric Box -->
-          <div class="rounded-2xl bg-gradient-to-r from-rose-500/10 via-pink-500/15 to-purple-500/10 border border-pink-200/80 p-4 text-center mb-3 min-h-[82px] flex flex-col items-center justify-center">
+          <div class="rounded-2xl bg-gradient-to-r from-rose-500/10 via-pink-500/15 to-purple-500/10 border border-pink-200/80 p-4 text-center mb-3 min-h-[88px] flex flex-col items-center justify-center no-scroll-anchor">
             <p id="currentLyricText" class="text-base sm:text-xl font-bold text-rose-700 transition-all duration-300">
               🎵 Có chắc yêu là đây, đây, đây...
             </p>
@@ -651,7 +659,7 @@
           </div>
 
           <!-- Interactive Lyrics List -->
-          <div id="lyricsList" class="lyrics-scroll max-h-44 overflow-y-auto space-y-1.5 pr-1">
+          <div id="lyricsList" class="lyrics-scroll relative max-h-44 overflow-y-auto space-y-1.5 pr-1">
             <!-- Populated by JS -->
           </div>
         </section>
@@ -1228,12 +1236,16 @@
         nextLyricText.textContent = `Tiếp theo: ${nextItem.text}`;
         stagePhaseLabel.textContent = currentItem.phase;
 
-        // Highlight active row in list
+        // Highlight active row in list and scroll ONLY inside #lyricsList (never the page window)
         const rows = lyricsList.querySelectorAll(".lyric-row");
         rows.forEach((r, idx) => {
           if (idx === foundIdx) {
             r.className = "lyric-row w-full text-left px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-between gap-2 bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-sm cursor-pointer";
-            r.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            const targetScrollTop = r.offsetTop - (lyricsList.clientHeight / 2) + (r.offsetHeight / 2);
+            lyricsList.scrollTo({
+              top: Math.max(0, targetScrollTop),
+              behavior: "smooth"
+            });
           } else {
             r.className = "lyric-row w-full text-left px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition flex items-center justify-between gap-2 hover:bg-pink-100/80 text-rose-800/75 cursor-pointer";
           }
