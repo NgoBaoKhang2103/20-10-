@@ -214,15 +214,13 @@
       transform: scale(1.2);
     }
 
-    /* Prevent browser scroll anchoring from jumping back up when lyrics/stage update */
-    .no-scroll-anchor {
-      overflow-anchor: none;
+    /* Strict layout containment so dynamic text never shifts page scroll on mobile */
+    .strict-fixed-box {
+      contain: layout style;
     }
 
     /* Custom Scrollbar for Lyrics */
     .lyrics-scroll {
-      overflow-anchor: none;
-    }
     .lyrics-scroll::-webkit-scrollbar {
       width: 5px;
     }
@@ -458,21 +456,57 @@
       </div>
     </header>
 
+    <!-- Mobile-Friendly Quick View Mode Bar (Prevents having to scroll up/down on narrow screens) -->
+    <nav aria-label="Chế độ hiển thị nhanh" class="glass-card rounded-2xl p-2 mb-5 flex items-center justify-between gap-1.5 overflow-x-auto">
+      <button
+        type="button"
+        data-view="all"
+        class="view-tab-btn flex-1 min-w-fit px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+      >
+        <span>✨</span>
+        <span>Xem Tất Cả</span>
+      </button>
+      <button
+        type="button"
+        data-view="fortune"
+        class="view-tab-btn flex-1 min-w-fit px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition text-rose-800 hover:bg-pink-100/80 flex items-center justify-center gap-1.5 cursor-pointer"
+      >
+        <span>🔮</span>
+        <span>Rút Quẻ 20/10</span>
+      </button>
+      <button
+        type="button"
+        data-view="card"
+        class="view-tab-btn flex-1 min-w-fit px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition text-rose-800 hover:bg-pink-100/80 flex items-center justify-center gap-1.5 cursor-pointer"
+      >
+        <span>💌</span>
+        <span>Thiệp Chúc</span>
+      </button>
+      <button
+        type="button"
+        data-view="music"
+        class="view-tab-btn flex-1 min-w-fit px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition text-rose-800 hover:bg-pink-100/80 flex items-center justify-center gap-1.5 cursor-pointer"
+      >
+        <span>🎵</span>
+        <span>Nhạc &amp; Hoa</span>
+      </button>
+    </nav>
+
     <!-- Main 2-Column Responsive Layout -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <div id="mainGridContainer" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
       <!-- LEFT COLUMN (7 cols): Music Stage, Synced Lyrics & Bouquet Climax -->
-      <div class="lg:col-span-7 flex flex-col gap-6 no-scroll-anchor">
+      <div id="leftColumnWrapper" class="lg:col-span-7 flex flex-col gap-6">
 
         <!-- 1. Beat-Synced Vinyl Player & Real-Time Visualizer Card -->
-        <section class="glass-card rounded-3xl p-5 sm:p-6 relative overflow-hidden no-scroll-anchor">
+        <section id="musicStageSection" class="glass-card rounded-3xl p-5 sm:p-6 relative overflow-hidden">
           <!-- Stage Status Pill -->
           <div class="flex items-center justify-between gap-2 mb-4">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100/90 border border-rose-200 text-rose-700 text-xs font-semibold">
-              <span id="musicStatusDot" class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-              <span id="stagePhaseLabel">Đang phát: Có Chắc Yêu Là Đây (Remix)</span>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100/90 border border-rose-200 text-rose-700 text-xs font-semibold max-w-[68%] sm:max-w-none overflow-hidden">
+              <span id="musicStatusDot" class="w-2 h-2 rounded-full bg-rose-500 animate-ping shrink-0"></span>
+              <span id="stagePhaseLabel" class="truncate whitespace-nowrap">Đang phát: Có Chắc Yêu Là Đây (Remix)</span>
             </div>
-            <span id="timeDisplay" class="text-xs font-mono font-semibold text-rose-700 bg-white/80 px-2.5 py-1 rounded-lg border border-pink-100">
+            <span id="timeDisplay" class="text-xs font-mono font-semibold text-rose-700 bg-white/80 px-2.5 py-1 rounded-lg border border-pink-100 shrink-0">
               0:00 / 0:39
             </span>
           </div>
@@ -503,8 +537,8 @@
 
             <!-- Interactive Bouquet & Gift Climax Stage -->
             <div class="sm:col-span-7 flex flex-col items-center text-center bg-gradient-to-b from-white/75 to-pink-50/70 rounded-2xl p-4 border border-pink-200/60 relative overflow-hidden">
-              <!-- Climax Highlight Banner (Triggered at 0:21 / 0:30 or manually) -->
-              <div id="climaxBanner" class="mb-1 px-3 py-1 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[11px] font-semibold shadow-sm transition-all duration-500 opacity-90">
+              <!-- Climax Highlight Banner (Fixed single-line height on mobile) -->
+              <div id="climaxBanner" class="mb-1 px-3 h-7 flex items-center justify-center rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[11px] font-semibold shadow-sm transition-colors duration-500 max-w-full truncate whitespace-nowrap">
                 💐 Chạm vào bó hoa để thả tim yêu thương!
               </div>
 
@@ -585,7 +619,7 @@
                 </svg>
               </div>
 
-              <p id="bouquetCaption" class="text-xs text-rose-800/90 font-medium">
+              <p id="bouquetCaption" class="text-xs text-rose-800/90 font-medium h-9 flex items-center justify-center overflow-hidden px-1 leading-snug">
                 “Nhanh chân chạy mua một bó hoa, thêm luôn một món quà...”
               </p>
             </div>
@@ -639,37 +673,46 @@
         </section>
 
         <!-- 2. Karaoke Beat-Synced Lyrics Stage -->
-        <section class="glass-card rounded-3xl p-5 sm:p-6 no-scroll-anchor">
-          <div class="flex items-center justify-between mb-3">
+        <section id="lyricsStageSection" class="glass-card rounded-3xl p-5 sm:p-6">
+          <div class="flex items-center justify-between gap-2 mb-3 flex-wrap">
             <h3 class="font-serif-display font-bold text-base sm:text-lg text-rose-950 flex items-center gap-2">
               <span>🎤</span>
               <span>Lời Bài Hát Đồng Bộ Theo Nhạc</span>
             </h3>
-            <span class="text-xs text-rose-600/80">Chạm vào câu hát bất kỳ để nghe đoạn đó</span>
+            <button
+              id="toggleLyricsListBtn"
+              type="button"
+              class="px-3 py-1 rounded-full bg-pink-100 hover:bg-pink-200 text-rose-700 text-xs font-semibold transition flex items-center gap-1 cursor-pointer"
+            >
+              <span id="toggleLyricsListLabel">📜 Xem toàn bộ 14 câu hát ▼</span>
+            </button>
           </div>
 
-          <!-- Active Highlighted Lyric Box -->
-          <div class="rounded-2xl bg-gradient-to-r from-rose-500/10 via-pink-500/15 to-purple-500/10 border border-pink-200/80 p-4 text-center mb-3 min-h-[88px] flex flex-col items-center justify-center no-scroll-anchor">
-            <p id="currentLyricText" class="text-base sm:text-xl font-bold text-rose-700 transition-all duration-300">
+          <!-- Active Highlighted Lyric Box (Strictly locked height so long lyrics never shift page layout on mobile) -->
+          <div class="strict-fixed-box rounded-2xl bg-gradient-to-r from-rose-500/10 via-pink-500/15 to-purple-500/10 border border-pink-200/80 px-4 py-3 text-center h-[132px] sm:h-[108px] overflow-hidden flex flex-col items-center justify-center">
+            <p id="currentLyricText" class="text-sm sm:text-lg font-bold text-rose-700 leading-snug line-clamp-2">
               🎵 Có chắc yêu là đây, đây, đây...
             </p>
-            <p id="nextLyricText" class="text-xs sm:text-sm text-rose-500/75 mt-1 font-medium">
+            <p id="nextLyricText" class="text-xs sm:text-sm text-rose-500/80 mt-1.5 font-medium truncate max-w-full">
               Tiếp theo: Em lang thang cả ngày trong tâm trí...
             </p>
           </div>
 
-          <!-- Interactive Lyrics List -->
-          <div id="lyricsList" class="lyrics-scroll relative max-h-44 overflow-y-auto space-y-1.5 pr-1">
-            <!-- Populated by JS -->
+          <!-- Interactive Lyrics List (Collapsed by default on mobile to keep page compact & 100% scroll-jump free) -->
+          <div id="lyricsListWrapper" class="hidden mt-3 pt-2 border-t border-pink-100">
+            <p class="text-[11px] text-rose-600/80 mb-2 text-center">Chạm vào câu hát bất kỳ bên dưới để chuyển nhanh tới đoạn nhạc đó:</p>
+            <div id="lyricsList" class="lyrics-scroll relative max-h-48 overflow-y-auto space-y-1.5 pr-1">
+              <!-- Populated by JS -->
+            </div>
           </div>
         </section>
       </div>
 
       <!-- RIGHT COLUMN (5 cols): Personalized 20/10 Greeting Card & Fortune Gift Box -->
-      <div class="lg:col-span-5 flex flex-col gap-6">
+      <div id="rightColumnWrapper" class="lg:col-span-5 flex flex-col gap-6">
 
         <!-- 3. 20/10 Greeting Card with Mode Switcher & Typewriter Effect -->
-        <section class="glass-card rounded-3xl p-5 sm:p-6 relative overflow-hidden">
+        <section id="greetingCardSection" class="glass-card rounded-3xl p-5 sm:p-6 relative overflow-hidden">
           <!-- Subtle Corner Floral Ornament -->
           <div class="flex items-center justify-between gap-2 mb-3 flex-wrap">
             <span class="text-xs font-bold uppercase tracking-wider text-rose-600 bg-rose-100/80 px-3 py-1 rounded-full border border-rose-200">
@@ -702,30 +745,33 @@
             </div>
           </div>
 
-          <!-- Letter Paper Surface -->
-          <div class="rounded-2xl bg-gradient-to-br from-white/95 via-rose-50/90 to-pink-50/85 border border-pink-200/80 p-5 shadow-inner min-h-[215px] flex flex-col justify-between">
+          <!-- Letter Paper Surface (Uses Ghost Grid Overlay so Typewriter NEVER changes card height) -->
+          <div class="rounded-2xl bg-gradient-to-br from-white/95 via-rose-50/90 to-pink-50/85 border border-pink-200/80 p-5 shadow-inner flex flex-col justify-between">
             <div>
               <h3 id="cardGreetingTitle" class="font-script text-2xl sm:text-3xl font-bold text-rose-600 mb-2">
                 Gửi những cô gái tuyệt vời nhất,
               </h3>
-              <p id="cardGreetingBody" class="text-sm sm:text-[15px] text-rose-950/90 leading-relaxed whitespace-pre-line">
-              </p>
+              <div class="grid grid-cols-1 grid-rows-1">
+                <!-- Invisible ghost reserves exact final height of full text so typing never causes layout shift -->
+                <p id="cardGreetingGhost" aria-hidden="true" class="col-start-1 row-start-1 invisible pointer-events-none select-none text-sm sm:text-[15px] leading-relaxed whitespace-pre-line"></p>
+                <p id="cardGreetingBody" class="col-start-1 row-start-1 text-sm sm:text-[15px] text-rose-950/90 leading-relaxed whitespace-pre-line"></p>
+              </div>
             </div>
 
-            <div class="mt-4 pt-3 border-t border-pink-200/60 flex items-center justify-between text-xs text-rose-700/80">
+            <div class="mt-4 pt-3 border-t border-pink-200/60 flex flex-wrap items-center justify-between gap-2 text-xs text-rose-700/80">
               <span class="font-script text-lg text-rose-600 font-bold">Chúc mừng ngày 20/10 🌸</span>
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1.5 flex-wrap">
                 <button
                   id="replayTypewriterBtn"
                   type="button"
-                  class="px-2.5 py-1 rounded-lg bg-pink-100 hover:bg-pink-200 text-rose-800 font-medium transition cursor-pointer"
+                  class="px-2.5 py-1.5 rounded-lg bg-pink-100 hover:bg-pink-200 text-rose-800 font-medium transition cursor-pointer"
                 >
                   ✍️ Viết lại
                 </button>
                 <button
                   id="copyWishBtn"
                   type="button"
-                  class="px-2.5 py-1 rounded-lg bg-rose-500 hover:bg-rose-600 text-white font-medium transition cursor-pointer"
+                  class="px-2.5 py-1.5 rounded-lg bg-rose-500 hover:bg-rose-600 text-white font-medium transition cursor-pointer"
                 >
                   📋 Sao chép lời chúc
                 </button>
@@ -735,13 +781,13 @@
         </section>
 
         <!-- 4. Interactive "Hái Lộc Hoa & Quẻ Chúc May Mắn 20/10" -->
-        <section class="glass-card rounded-3xl p-5 sm:p-6">
+        <section id="fortuneSection" class="glass-card rounded-3xl p-5 sm:p-6">
           <div class="flex items-center justify-between mb-2">
             <h3 class="font-serif-display font-bold text-base sm:text-lg text-rose-950 flex items-center gap-2">
               <span>🎁</span>
               <span>Góc Hái Hoa &amp; Nhận Quẻ Chúc 20/10</span>
             </h3>
-            <span id="openedCountBadge" class="text-xs font-semibold text-rose-700 bg-pink-100 px-2.5 py-0.5 rounded-full">
+            <span id="openedCountBadge" class="text-xs font-semibold text-rose-700 bg-pink-100 px-2.5 py-0.5 rounded-full shrink-0">
               Đã mở: 0/6
             </span>
           </div>
@@ -751,11 +797,11 @@
 
           <!-- 6 Mini Gift Tokens Grid -->
           <div id="fortuneGrid" class="grid grid-cols-3 gap-2.5 mb-4">
-            <!-- Rendered by JS -->
+            <!-- Rendered once by JS -->
           </div>
 
-          <!-- Active Fortune Result Box -->
-          <div id="fortuneResultBox" class="rounded-2xl bg-gradient-to-r from-pink-50 via-white to-purple-50 border border-pink-200 p-4 text-center transition-all">
+          <!-- Active Fortune Result Box (Fixed minimum height so opening a fortune never shifts scroll) -->
+          <div id="fortuneResultBox" class="rounded-2xl bg-gradient-to-r from-pink-50 via-white to-purple-50 border border-pink-200 p-4 text-center transition-colors min-h-[116px] flex flex-col items-center justify-center">
             <div id="fortuneBadgeTitle" class="text-xs font-bold uppercase tracking-wide text-rose-600 mb-1">
               ✨ Quẻ Chúc Ngẫu Nhiên 20/10 ✨
             </div>
@@ -1196,23 +1242,107 @@
       return `${m}:${rem < 10 ? "0" + rem : rem}`;
     }
 
+    let isUserSeeking = false;
+    const cardGreetingGhost = document.getElementById("cardGreetingGhost");
+    const toggleLyricsListBtn = document.getElementById("toggleLyricsListBtn");
+    const toggleLyricsListLabel = document.getElementById("toggleLyricsListLabel");
+    const lyricsListWrapper = document.getElementById("lyricsListWrapper");
+
+    if (toggleLyricsListBtn && lyricsListWrapper) {
+      toggleLyricsListBtn.addEventListener("click", () => {
+        const isHidden = lyricsListWrapper.classList.contains("hidden");
+        if (isHidden) {
+          lyricsListWrapper.classList.remove("hidden");
+          toggleLyricsListLabel.textContent = "📜 Thu gọn danh sách câu hát ▲";
+        } else {
+          lyricsListWrapper.classList.add("hidden");
+          toggleLyricsListLabel.textContent = "📜 Xem toàn bộ 14 câu hát ▼";
+        }
+        toggleLyricsListBtn.blur();
+      });
+    }
+
+    // Mobile & Desktop View Mode Switcher ("all", "fortune", "card", "music")
+    const leftColumnWrapper = document.getElementById("leftColumnWrapper");
+    const rightColumnWrapper = document.getElementById("rightColumnWrapper");
+    const musicStageSection = document.getElementById("musicStageSection");
+    const lyricsStageSection = document.getElementById("lyricsStageSection");
+    const greetingCardSection = document.getElementById("greetingCardSection");
+    const fortuneSection = document.getElementById("fortuneSection");
+
+    function setViewMode(mode) {
+      document.querySelectorAll(".view-tab-btn").forEach((btn) => {
+        if (btn.dataset.view === mode) {
+          btn.className = "view-tab-btn flex-1 min-w-fit px-3 py-2 rounded-xl text-xs sm:text-sm font-bold transition bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-sm flex items-center justify-center gap-1.5 cursor-pointer";
+        } else {
+          btn.className = "view-tab-btn flex-1 min-w-fit px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition text-rose-800 hover:bg-pink-100/80 flex items-center justify-center gap-1.5 cursor-pointer";
+        }
+      });
+
+      if (mode === "all") {
+        leftColumnWrapper.classList.remove("hidden");
+        rightColumnWrapper.classList.remove("hidden");
+        leftColumnWrapper.className = "lg:col-span-7 flex flex-col gap-6";
+        rightColumnWrapper.className = "lg:col-span-5 flex flex-col gap-6";
+        musicStageSection.classList.remove("hidden");
+        lyricsStageSection.classList.remove("hidden");
+        greetingCardSection.classList.remove("hidden");
+        fortuneSection.classList.remove("hidden");
+      } else if (mode === "fortune") {
+        leftColumnWrapper.classList.add("hidden");
+        rightColumnWrapper.classList.remove("hidden");
+        rightColumnWrapper.className = "lg:col-span-12 max-w-xl mx-auto w-full flex flex-col gap-6";
+        greetingCardSection.classList.add("hidden");
+        fortuneSection.classList.remove("hidden");
+      } else if (mode === "card") {
+        leftColumnWrapper.classList.add("hidden");
+        rightColumnWrapper.classList.remove("hidden");
+        rightColumnWrapper.className = "lg:col-span-12 max-w-xl mx-auto w-full flex flex-col gap-6";
+        greetingCardSection.classList.remove("hidden");
+        fortuneSection.classList.add("hidden");
+      } else if (mode === "music") {
+        leftColumnWrapper.classList.remove("hidden");
+        rightColumnWrapper.classList.add("hidden");
+        leftColumnWrapper.className = "lg:col-span-12 max-w-2xl mx-auto w-full flex flex-col gap-6";
+        musicStageSection.classList.remove("hidden");
+        lyricsStageSection.classList.remove("hidden");
+      }
+    }
+
+    document.querySelectorAll(".view-tab-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        setViewMode(btn.dataset.view);
+        btn.blur();
+      });
+    });
+
     function triggerBouquetClimaxEffect() {
+      const savedScrollY = window.scrollY;
       bouquetContainer.classList.add("climax-bloom");
       climaxBanner.textContent = "🎉 “Mua một bó hoa, thêm luôn một món quà!” 🎁";
-      climaxBanner.className = "mb-1 px-3.5 py-1 rounded-full bg-gradient-to-r from-rose-600 via-pink-500 to-purple-600 text-white text-xs font-bold shadow-md transition-all duration-500 scale-105";
+      climaxBanner.className = "mb-1 px-3 h-7 flex items-center justify-center rounded-full bg-gradient-to-r from-rose-600 via-pink-500 to-purple-600 text-white text-[11px] font-bold shadow-md transition-colors duration-500 max-w-full truncate whitespace-nowrap";
       bouquetCaption.textContent = "✨ Chúc các bạn nữ 20/10 luôn tươi cười rạng rỡ, gạt đi mọi âu lo! ✨";
 
       const rect = bouquetContainer.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      spawnCelebrationBurst(cx > 0 ? cx : window.innerWidth / 2, cy > 0 ? cy : window.innerHeight / 2, 48);
+      const isVisible = rect.top >= -50 && rect.bottom <= window.innerHeight + 50;
+      if (isVisible) {
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        spawnCelebrationBurst(cx > 0 ? cx : window.innerWidth / 2, cy > 0 ? cy : window.innerHeight / 2, 48);
+      }
+      if (window.scrollY !== savedScrollY) {
+        window.scrollTo(0, savedScrollY);
+      }
     }
 
     function syncLyricsAndStage(currentTime, manualJump = false) {
+      const savedScrollY = window.scrollY;
       const duration = bgAudio.duration && isFinite(bgAudio.duration) ? bgAudio.duration : 39.5;
       timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
-      seekSlider.max = duration.toFixed(1);
-      seekSlider.value = currentTime;
+      if (!isUserSeeking) {
+        seekSlider.max = duration.toFixed(1);
+        seekSlider.value = currentTime;
+      }
 
       if (currentTime < 2.0) {
         climaxTriggeredInLoop = false;
@@ -1236,18 +1366,13 @@
         nextLyricText.textContent = `Tiếp theo: ${nextItem.text}`;
         stagePhaseLabel.textContent = currentItem.phase;
 
-        // Highlight active row in list and scroll ONLY inside #lyricsList (never the page window)
+        // Highlight active row in list WITHOUT calling any scrollTo/scrollIntoView so mobile never jumps!
         const rows = lyricsList.querySelectorAll(".lyric-row");
         rows.forEach((r, idx) => {
           if (idx === foundIdx) {
-            r.className = "lyric-row w-full text-left px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-between gap-2 bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-sm cursor-pointer";
-            const targetScrollTop = r.offsetTop - (lyricsList.clientHeight / 2) + (r.offsetHeight / 2);
-            lyricsList.scrollTo({
-              top: Math.max(0, targetScrollTop),
-              behavior: "smooth"
-            });
+            r.className = "lyric-row w-full text-left px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-colors flex items-center justify-between gap-2 bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-sm cursor-pointer";
           } else {
-            r.className = "lyric-row w-full text-left px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition flex items-center justify-between gap-2 hover:bg-pink-100/80 text-rose-800/75 cursor-pointer";
+            r.className = "lyric-row w-full text-left px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors flex items-center justify-between gap-2 hover:bg-pink-100/80 text-rose-800/75 cursor-pointer";
           }
         });
 
@@ -1256,6 +1381,11 @@
           climaxTriggeredInLoop = true;
           triggerBouquetClimaxEffect();
         }
+      }
+
+      // Guarantee zero unintended window scroll shift on mobile WebViews
+      if (!manualJump && window.scrollY !== savedScrollY) {
+        window.scrollTo(0, savedScrollY);
       }
     }
 
@@ -1268,6 +1398,9 @@
       const bodyStr = template.getBody(recipientName);
 
       cardGreetingTitle.textContent = titleStr;
+      if (cardGreetingGhost) {
+        cardGreetingGhost.textContent = bodyStr;
+      }
       cardGreetingBody.textContent = "";
 
       let charIndex = 0;
@@ -1282,34 +1415,48 @@
       }, 18);
     }
 
-    // ==================== 8. FORTUNE GIFT GRID ====================
+    // ==================== 8. FORTUNE GIFT GRID (IN-PLACE DOM UPDATE) ====================
     function renderFortuneGrid() {
-      fortuneGrid.innerHTML = "";
-      FORTUNE_ITEMS.forEach((item, index) => {
+      // Only build buttons ONCE if empty; otherwise update in-place so tapped buttons are never destroyed!
+      if (fortuneGrid.children.length === 0) {
+        FORTUNE_ITEMS.forEach((item, index) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.dataset.fortuneId = item.id;
+          btn.innerHTML = `
+            <span class="text-2xl pointer-events-none">${item.icon}</span>
+            <span class="text-xs font-semibold text-rose-900 pointer-events-none">${item.label}</span>
+            <span class="fortune-status-label text-[10px] text-rose-400 pointer-events-none">Chạm để mở</span>
+          `;
+          btn.addEventListener("click", (e) => {
+            openFortuneItem(index, e.clientX, e.clientY);
+          });
+          fortuneGrid.appendChild(btn);
+        });
+      }
+
+      Array.from(fortuneGrid.children).forEach((btn, index) => {
+        const item = FORTUNE_ITEMS[index];
         const isOpened = openedFortunes.has(item.id);
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = `p-3 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
+        btn.className = `p-3 rounded-2xl border text-center transition-colors flex flex-col items-center justify-center gap-1 cursor-pointer ${
           isOpened
             ? "bg-gradient-to-b from-rose-100 to-pink-100 border-rose-300 shadow-inner"
-            : "bg-white/85 hover:bg-pink-50 border-pink-200/80 shadow-sm hover:-translate-y-0.5"
+            : "bg-white/85 hover:bg-pink-50 border-pink-200/80 shadow-sm"
         }`;
-        btn.innerHTML = `
-          <span class="text-2xl">${item.icon}</span>
-          <span class="text-xs font-semibold text-rose-900">${item.label}</span>
-          <span class="text-[10px] ${isOpened ? "text-rose-600 font-bold" : "text-rose-400"}">
-            ${isOpened ? "Đã mở ✓" : "Chạm để mở"}
-          </span>
-        `;
-        btn.addEventListener("click", (e) => {
-          openFortuneItem(index, e.clientX, e.clientY);
-        });
-        fortuneGrid.appendChild(btn);
+        const statusSpan = btn.querySelector(".fortune-status-label");
+        if (statusSpan) {
+          statusSpan.className = `fortune-status-label text-[10px] pointer-events-none ${
+            isOpened ? "text-rose-600 font-bold" : "text-rose-400"
+          }`;
+          statusSpan.textContent = isOpened ? "Đã mở ✓" : "Chạm để mở";
+        }
       });
+
       openedCountBadge.textContent = `Đã mở: ${openedFortunes.size}/${FORTUNE_ITEMS.length}`;
     }
 
     function openFortuneItem(index, clientX, clientY) {
+      const savedScrollY = window.scrollY;
       const item = FORTUNE_ITEMS[index];
       openedFortunes.add(item.id);
       renderFortuneGrid();
@@ -1320,6 +1467,10 @@
       const x = clientX || window.innerWidth / 2;
       const y = clientY || window.innerHeight / 2;
       spawnCelebrationBurst(x, y, 28);
+
+      if (window.scrollY !== savedScrollY) {
+        window.scrollTo(0, savedScrollY);
+      }
     }
 
     // ==================== 9. AUDIO PLAYBACK & UI HANDLERS ====================
@@ -1447,7 +1598,13 @@
       showToast("Đã phát lại bài nhạc từ đầu 🎵");
     });
 
+    seekSlider.addEventListener("pointerdown", () => { isUserSeeking = true; });
+    seekSlider.addEventListener("touchstart", () => { isUserSeeking = true; }, { passive: true });
+    seekSlider.addEventListener("pointerup", () => { isUserSeeking = false; seekSlider.blur(); });
+    seekSlider.addEventListener("touchend", () => { isUserSeeking = false; seekSlider.blur(); }, { passive: true });
+    seekSlider.addEventListener("change", () => { isUserSeeking = false; seekSlider.blur(); });
     seekSlider.addEventListener("input", (e) => {
+      isUserSeeking = true;
       const targetTime = parseFloat(e.target.value);
       bgAudio.currentTime = targetTime;
       syncLyricsAndStage(targetTime, true);
